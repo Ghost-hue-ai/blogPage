@@ -16,6 +16,9 @@ interface Post {
   heading: string;
   description: string;
   createdAt: string;
+  likes: object;
+  isLikedByCurrentUser: boolean;
+  likesCount: number;
 }
 
 export default function RenderPost() {
@@ -143,8 +146,11 @@ export default function RenderPost() {
 
               {/* Body */}
               {post.description && (
-                <div className="px-4 pb-3">
-                  <p className="text-gray-800 dark:text-gray-200 text-[15px] leading-snug">
+                <div className="px-4 pb-3 border border-gray-200 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-800 shadow-sm">
+                  <h2 className="text-gray-900 dark:text-gray-100 text-lg font-semibold mb-1">
+                    {post.heading}
+                  </h2>
+                  <p className="text-gray-700 dark:text-gray-300 text-sm leading-relaxed">
                     {post.description}
                   </p>
                 </div>
@@ -159,7 +165,7 @@ export default function RenderPost() {
 
               {/* Stats (likes & comments count) */}
               <div className="flex justify-between items-center px-4 py-2 border-b border-gray-200 dark:border-gray-700 text-sm text-gray-500">
-                <span>👍 ❤️ 120</span>
+                <span>👍 ❤️ {post.likesCount}</span>
                 <span>32 comments</span>
               </div>
 
@@ -177,7 +183,7 @@ export default function RenderPost() {
                     }
                   }}
                   className={`flex items-center gap-2 px-4 py-2 rounded-md transition ${
-                    isLiked
+                    post.isLikedByCurrentUser
                       ? "text-blue-600"
                       : "text-gray-600 hover:text-blue-600"
                   }`}

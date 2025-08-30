@@ -14,7 +14,7 @@ import { Label } from "@/components/ui/label";
 import { useForm } from "react-hook-form";
 import axios from "axios";
 import { Heading } from "lucide-react";
-import { useSession } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
 
 interface FormData {
   heading: string;
@@ -131,6 +131,7 @@ export default function PublishPost() {
             alt="User Icon"
             className="h-12 w-12 rounded-full border-2 border-gray-600"
           />
+          {/* <button onClick={() => signOut()}>signOut</button> */}
           <Dialog>
             <DialogTrigger>
               <input

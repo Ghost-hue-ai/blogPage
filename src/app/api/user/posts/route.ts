@@ -68,6 +68,8 @@ export async function GET(req: Request) {
   await dbConnect();
   try {
     const session = await getServerSession(authOptions);
+    console.log(session);
+
     const currentUserId = session?.user._id;
     const posts = await PostModel.aggregate([
       {
