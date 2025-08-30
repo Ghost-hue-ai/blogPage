@@ -92,9 +92,22 @@ export async function GET(req: Request) {
         },
       },
       { $unwind: "$owner" },
+      {
+        $lookup: {
+          from: "likes",
+          localField: "likes",
+          foreignField: "_id",
+          as: "likes",
+        },
+      },
+      {
+        $addFields: {
+          likesCount: { $size: "$likes" },
+        },
+      },
     ]);
 
-    if (!posts) {
+    if (posts.length === 0) {
       return Response.json(
         {
           error: "post not found",

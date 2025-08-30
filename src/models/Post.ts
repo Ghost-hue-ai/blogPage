@@ -27,10 +27,7 @@ const postSchema: Schema<Post> = new Schema(
       type: Number,
       default: 0,
     },
-    likes: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "likes",
-    },
+    likes: [{ type: mongoose.Schema.Types.ObjectId, ref: "likes" }],
   },
   { timestamps: true }
 );
