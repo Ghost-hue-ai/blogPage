@@ -4,7 +4,7 @@ interface Post extends Document {
   heading: string;
   description: string;
   owner: Schema.Types.ObjectId;
-  isLikedByCurrentUser: number;
+  isLikedByCurrentUser: mongoose.Schema.Types.ObjectId;
   likes: mongoose.Schema.Types.ObjectId;
 }
 
@@ -24,8 +24,8 @@ const postSchema: Schema<Post> = new Schema(
       required: true,
     },
     isLikedByCurrentUser: {
-      type: Number,
-      default: 0,
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Like",
     },
     likes: [{ type: mongoose.Schema.Types.ObjectId, ref: "likes" }],
   },

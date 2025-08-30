@@ -4,6 +4,7 @@ import UserModel from "@/models/User";
 import PostModel from "@/models/Post";
 import { authOptions } from "../../auth/[...nextauth]/options";
 import { getServerSession } from "next-auth";
+import LikeModel from "@/models/Like";
 
 interface Params {
   postId: string;
@@ -12,6 +13,7 @@ export async function POST(req: Request) {
   await dbConnect();
   try {
     const session = await getServerSession(authOptions);
+
     if (!session) {
       return Response.json(
         {
@@ -65,11 +67,11 @@ export async function POST(req: Request) {
 export async function GET(req: Request) {
   await dbConnect();
   try {
+    const session = await getServerSession(authOptions);
+    const currentUserId = session?.user._id;
     const posts = await PostModel.aggregate([
       {
-        $match: {
-          _id: { $exists: true },
-        },
+        $match: { _id: { $exists: true } },
       },
       {
         $lookup: {
@@ -77,15 +79,10 @@ export async function GET(req: Request) {
           let: { userId: "$owner" },
           pipeline: [
             {
-              $match: {
-                $expr: { $eq: ["$_id", "$$userId"] },
-              },
+              $match: { $expr: { $eq: ["$_id", "$$userId"] } },
             },
             {
-              $project: {
-                username: 1,
-                _id: 1,
-              },
+              $project: { username: 1, _id: 1 },
             },
           ],
           as: "owner",
@@ -95,8 +92,11 @@ export async function GET(req: Request) {
       {
         $lookup: {
           from: "likes",
-          localField: "likes",
-          foreignField: "_id",
+          let: { postId: "$_id" },
+          pipeline: [
+            { $match: { $expr: { $eq: ["$postId", "$$postId"] } } },
+            { $project: { owner: 1, postId: 1 } },
+          ],
           as: "likes",
         },
       },
@@ -105,33 +105,49 @@ export async function GET(req: Request) {
           likesCount: { $size: "$likes" },
         },
       },
+
+      {
+        $lookup: {
+          from: "likes",
+          let: { postId: "$_id" },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $and: [
+                    { $eq: ["$post", "$$postId"] },
+                    { $eq: ["$owner", currentUserId] },
+                  ],
+                },
+              },
+            },
+          ],
+          as: "isLikedByCurrentUser",
+        },
+      },
+      {
+        $addFields: {
+          isLikedByCurrentUser: {
+            $gt: [{ $size: "$isLikedByCurrentUser" }, 0],
+          },
+        },
+      },
     ]);
 
     if (posts.length === 0) {
       return Response.json(
-        {
-          error: "post not found",
-          success: false,
-        },
+        { error: "post not found", success: false },
         { status: 404 }
       );
     }
 
     return Response.json(
-      {
-        message: "successfully fetched posts",
-        success: true,
-        data: posts,
-      },
+      { message: "successfully fetched posts", success: true, data: posts },
       { status: 200 }
     );
   } catch (error) {
     return Response.json(
-      {
-        error: "failed getting  post",
-        errorObject: error,
-        success: false,
-      },
+      { error: "failed getting post", errorObject: error, success: false },
       { status: 500 }
     );
   }
