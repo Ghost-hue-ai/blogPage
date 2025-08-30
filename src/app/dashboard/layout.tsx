@@ -7,7 +7,6 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     <div>
       <Navbar />
       <Sidebar />
-      <PublishPost />
 
       <div className="">
         <main>{children}</main>

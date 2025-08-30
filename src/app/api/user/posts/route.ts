@@ -65,7 +65,34 @@ export async function POST(req: Request) {
 export async function GET(req: Request) {
   await dbConnect();
   try {
-    const posts = await PostModel.find();
+    const posts = await PostModel.aggregate([
+      {
+        $match: {
+          _id: { $exists: true },
+        },
+      },
+      {
+        $lookup: {
+          from: "users",
+          let: { userId: "$owner" },
+          pipeline: [
+            {
+              $match: {
+                $expr: { $eq: ["$_id", "$$userId"] },
+              },
+            },
+            {
+              $project: {
+                username: 1,
+                _id: 1,
+              },
+            },
+          ],
+          as: "owner",
+        },
+      },
+      { $unwind: "$owner" },
+    ]);
 
     if (!posts) {
       return Response.json(
