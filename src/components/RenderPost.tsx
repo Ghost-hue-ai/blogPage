@@ -3,6 +3,10 @@ import React, { useState, useEffect } from "react";
 import { toast } from "sonner";
 import axios from "axios";
 
+interface CreatedObject {
+  createdAt: string;
+}
+
 interface Owner {
   username: string;
 }
@@ -27,7 +31,13 @@ export default function RenderPost() {
         console.log(res);
         setRendered(true);
 
-        setPosts(res.data.data);
+        setPosts(() =>
+          res.data.data.sort((a: CreatedObject, b: CreatedObject) => {
+            const aCreatedAt = new Date(a.createdAt).getTime();
+            const bCreatedAt = new Date(b.createdAt).getTime();
+            return bCreatedAt - aCreatedAt;
+          })
+        );
       }
     } catch (error: any) {
       console.log(error);
