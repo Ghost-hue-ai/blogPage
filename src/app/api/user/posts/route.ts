@@ -70,7 +70,7 @@ export async function GET(req: Request) {
     const session = await getServerSession(authOptions);
     console.log(session);
 
-    const currentUserId = session?.user._id;
+    const currentUserId = new mongoose.Types.ObjectId(session?.user._id);
     const posts = await PostModel.aggregate([
       {
         $match: { _id: { $exists: true } },
@@ -96,7 +96,7 @@ export async function GET(req: Request) {
           from: "likes",
           let: { postId: "$_id" },
           pipeline: [
-            { $match: { $expr: { $eq: ["$postId", "$$postId"] } } },
+            { $match: { $expr: { $eq: ["$post", "$$postId"] } } },
             { $project: { owner: 1, postId: 1 } },
           ],
           as: "likes",

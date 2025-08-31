@@ -40,7 +40,6 @@ export async function POST(req: Request, { params }: { params: Params }) {
     const like = new LikeModel({
       owner: userId,
       post: postId,
-      isLiked: true,
     });
 
     await like.save();
@@ -72,7 +71,6 @@ export async function GET(req: Request, { params }: { params: Params }) {
       {
         $match: {
           post: new mongoose.Types.ObjectId(postId),
-          isLiked: true,
         },
       },
       {

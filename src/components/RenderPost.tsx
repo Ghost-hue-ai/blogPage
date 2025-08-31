@@ -24,7 +24,6 @@ interface Post {
 export default function RenderPost() {
   const [posts, setPosts] = useState<Post[]>([]);
   const [rendered, setRendered] = useState(false);
-  const [isLiked, setIsLiked] = useState(false);
 
   const fetchAllPost = async () => {
     console.log("inside the fetchAllPost function");
@@ -174,16 +173,36 @@ export default function RenderPost() {
                 {/* Like button */}
                 <button
                   onClick={async () => {
-                    const nextLiked = !isLiked;
-                    setIsLiked(nextLiked);
-                    if (nextLiked) {
-                      await likePost(post._id);
-                    } else {
+                    if (post.isLikedByCurrentUser) {
                       await deleteLike(post._id);
+                      setPosts((prevPosts) => {
+                        return prevPosts.map((p) => {
+                          return p._id === post._id
+                            ? {
+                                ...p,
+                                isLikedByCurrentUser: false,
+                                likesCount: p.likesCount - 1,
+                              }
+                            : p;
+                        });
+                      });
+                    } else {
+                      await likePost(post._id);
+                      setPosts((prevPosts) => {
+                        return prevPosts.map((p) => {
+                          return p._id === post._id
+                            ? {
+                                ...p,
+                                isLikedByCurrentUser: true,
+                                likesCount: p.likesCount + 1,
+                              }
+                            : p;
+                        });
+                      });
                     }
                   }}
                   className={`flex items-center gap-2 px-4 py-2 rounded-md transition ${
-                    post.isLikedByCurrentUser
+                    posts.find((p) => p._id === post._id)?.isLikedByCurrentUser
                       ? "text-blue-600"
                       : "text-gray-600 hover:text-blue-600"
                   }`}
@@ -192,7 +211,12 @@ export default function RenderPost() {
                     width="20"
                     height="20"
                     viewBox="0 0 24 24"
-                    fill={isLiked ? "currentColor" : "none"}
+                    fill={
+                      posts.find((p) => p._id === post._id)
+                        ?.isLikedByCurrentUser
+                        ? "currentColor"
+                        : "none"
+                    }
                     stroke="currentColor"
                     strokeWidth="1.8"
                     strokeLinecap="round"
