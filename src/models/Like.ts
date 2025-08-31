@@ -3,7 +3,6 @@ import mongoose, { Schema, Document } from "mongoose";
 interface Like extends Document {
   owner: Schema.Types.ObjectId;
   post: Schema.Types.ObjectId;
-  isLiked: boolean;
 }
 
 const likeSchema: Schema<Like> = new Schema(
@@ -17,9 +16,6 @@ const likeSchema: Schema<Like> = new Schema(
       type: Schema.Types.ObjectId,
       ref: "Post",
       required: true,
-    },
-    isLiked: {
-      type: Boolean,
     },
   },
   { timestamps: true }
