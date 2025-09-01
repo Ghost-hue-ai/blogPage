@@ -26,6 +26,7 @@ export default function RenderPost() {
   const [posts, setPosts] = useState<Post[]>([]);
   const [rendered, setRendered] = useState(false);
   const [commentTabVisible, setCommentTabVisible] = useState(false);
+  const [commentProp, setCommentProp] = useState("");
 
   const fetchAllPost = async () => {
     console.log("inside the fetchAllPost function");
@@ -104,7 +105,7 @@ export default function RenderPost() {
   }, []);
   return (
     <div className="ml-[300px] relative  mt-16 flex flex-col justify-center p-4 bg-gray-50 dark:bg-[#1b1b21] min-h-screen">
-      {commentTabVisible ? <CommentTab /> : ""}
+      {commentTabVisible ? <CommentTab postId={commentProp} /> : ""}
       <div className="flex flex-col gap-8 w-[600px]">
         {rendered ? (
           posts.map((post) => (
@@ -228,7 +229,7 @@ export default function RenderPost() {
                     className="flex items-center gap-2 px-5 py-2 rounded-xl text-gray-600 hover:text-blue-600 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200"
                     onClick={() => {
                       setCommentTabVisible((prev) => !prev);
-                      console.log("button clicked");
+                      setCommentProp(post._id);
                     }}
                   >
                     Comment

@@ -50,13 +50,14 @@ export async function POST(req: Request, { params }: { params: Params }) {
         message: "successfully created a comment",
         success: true,
       },
-      { status: 20 }
+      { status: 200 }
     );
   } catch (error) {
     return Response.json(
       {
         error: "error creating a comment",
         success: false,
+        errorObj: error,
       },
       { status: 500 }
     );
