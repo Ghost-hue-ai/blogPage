@@ -134,6 +134,25 @@ export async function GET(req: Request) {
           },
         },
       },
+      {
+        $lookup: {
+          from: "comments",
+          let: { commentPost: "$post" },
+          pipeline: [
+            {
+              $match: {
+                $expr: { $eq: ["$owner", "$$commentPost"] },
+              },
+            },
+          ],
+          as: "comments",
+        },
+      },
+      {
+        $addFields: {
+          commentCount: { $size: "$comments" },
+        },
+      },
     ]);
 
     if (posts.length === 0) {

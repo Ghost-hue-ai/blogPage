@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import { toast } from "sonner";
 import axios from "axios";
 import { Skeleton } from "@/components/ui/skeleton";
+import CommentTab from "./CommentTab";
 interface CreatedObject {
   createdAt: string;
 }
@@ -24,6 +25,7 @@ interface Post {
 export default function RenderPost() {
   const [posts, setPosts] = useState<Post[]>([]);
   const [rendered, setRendered] = useState(false);
+  const [commentTabVisible, setCommentTabVisible] = useState(false);
 
   const fetchAllPost = async () => {
     console.log("inside the fetchAllPost function");
@@ -101,7 +103,8 @@ export default function RenderPost() {
     (async () => await fetchAllPost())();
   }, []);
   return (
-    <div className="ml-[300px]  mt-16 flex flex-col justify-center p-4 bg-gray-50 dark:bg-[#1b1b21] min-h-screen">
+    <div className="ml-[300px] relative  mt-16 flex flex-col justify-center p-4 bg-gray-50 dark:bg-[#1b1b21] min-h-screen">
+      {commentTabVisible ? <CommentTab /> : ""}
       <div className="flex flex-col gap-8 w-[600px]">
         {rendered ? (
           posts.map((post) => (
@@ -221,7 +224,13 @@ export default function RenderPost() {
                   </button>
 
                   {/* Comment button */}
-                  <button className="flex items-center gap-2 px-5 py-2 rounded-xl text-gray-600 hover:text-blue-600 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200">
+                  <button
+                    className="flex items-center gap-2 px-5 py-2 rounded-xl text-gray-600 hover:text-blue-600 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200"
+                    onClick={() => {
+                      setCommentTabVisible((prev) => !prev);
+                      console.log("button clicked");
+                    }}
+                  >
                     Comment
                   </button>
 

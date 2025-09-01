@@ -13,8 +13,8 @@ import { Input } from "./ui/input";
 import { Label } from "@/components/ui/label";
 import { useForm } from "react-hook-form";
 import axios from "axios";
-import { Heading } from "lucide-react";
 import { signOut, useSession } from "next-auth/react";
+import CommentTab from "./CommentTab";
 
 interface FormData {
   heading: string;
@@ -122,8 +122,9 @@ export default function PublishPost() {
     return <p>You must be logged in to publish a post.</p>;
   }
   return (
-    <div className="ml-[300px] mt-16 flex flex-col justify-center p-4">
+    <div className="ml-[300px] mt-16 flex flex-col justify-center p-4 relative">
       {/* Center the post box relative to sidebar */}
+
       <div className="w-full m-4 max-w-3xl bg-gray-800 rounded-xl shadow-md border border-gray-900 p-4">
         <div className="flex items-center gap-4">
           <img
@@ -272,7 +273,10 @@ export default function PublishPost() {
                 <span className="text-sm font-medium"></span>
               </button>
 
-              <button className="flex items-center gap-2 text-gray-500 hover:text-blue-600">
+              <button
+                onClick={() => {}}
+                className="flex items-center gap-2 text-gray-500 hover:text-blue-600"
+              >
                 <span className="text-sm font-medium">
                   <svg
                     width="24"
