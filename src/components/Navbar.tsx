@@ -2,7 +2,7 @@ import React from "react";
 
 export default function Navbar() {
   return (
-    <div className="nav bg-[#3F353D] w-screen sticky top-0 flex items-center justify-between py-[6px]">
+    <div className="nav bg-[#3F353D] w-screen sticky top-0 flex items-center justify-between py-[6px] z-10">
       {/* Logo */}
       <img src="/xing.png" alt="logo" loading="lazy" className="h-13" />
 

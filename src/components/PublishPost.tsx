@@ -124,7 +124,7 @@ export default function PublishPost() {
   return (
     <div className="ml-[300px] mt-16 flex flex-col justify-center p-4">
       {/* Center the post box relative to sidebar */}
-      <div className="w-full m-4 max-w-3xl bg-gray-800 rounded-xl shadow-md border border-gray-700 p-4">
+      <div className="w-full m-4 max-w-3xl bg-gray-800 rounded-xl shadow-md border border-gray-900 p-4">
         <div className="flex items-center gap-4">
           <img
             src="https://cdn-icons-png.flaticon.com/512/847/847969.png"
