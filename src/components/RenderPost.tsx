@@ -228,10 +228,30 @@ export default function RenderPost() {
                   <button
                     className="flex items-center gap-2 px-5 py-2 rounded-xl text-gray-600 hover:text-blue-600 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200"
                     onClick={() => {
-                      setCommentTabVisible((prev) => !prev);
-                      setCommentProp(post._id);
+                      if (post._id === commentProp) {
+                        // same post → toggle visibility
+                        setCommentTabVisible((prev) => !prev);
+                      } else {
+                        // different post → show tab and load new comments
+                        setCommentProp(post._id);
+                        setCommentTabVisible(true);
+                      }
                     }}
                   >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-5 w-5"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M7 8h10M7 12h4m1 8l-5-5H4a2 2 0 01-2-2V6a2 2 0 012-2h16a2 2 0 012 2v7a2 2 0 01-2 2h-3l-5 5z"
+                      />
+                    </svg>
                     Comment
                   </button>
 

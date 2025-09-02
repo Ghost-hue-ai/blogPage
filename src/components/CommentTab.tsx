@@ -4,17 +4,24 @@ import { Skeleton } from "@/components/ui/skeleton";
 import axios from "axios";
 import { toast } from "sonner";
 import { useForm } from "react-hook-form";
+import { useSession } from "next-auth/react";
 type commentSectionProp = {
   postId: string;
 };
+interface commentOwner {
+  _id: string;
+  username: string;
+}
 interface Comment {
   _id: string;
   content: string;
+  owner: commentOwner;
 }
 interface FormData {
   content: string;
 }
 export default function CommentTab({ postId }: commentSectionProp) {
+  const { data: session, status } = useSession();
   const [rendered, setRendered] = useState(false);
   const [id, setId] = useState([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]);
   const [comments, setComments] = useState<Comment[]>([]);
@@ -27,8 +34,17 @@ export default function CommentTab({ postId }: commentSectionProp) {
       const res = await axios.post(`/api/user/posts/${postId}/comment/`, {
         content: content,
       });
-      if (res) {
+      if (res.status >= 200 && res.status < 300) {
         console.log(res);
+        const newComment: Comment = {
+          _id: res.data.data._id as string,
+          content: res.data.data.content as string,
+          owner: {
+            _id: session?.user._id ?? "Unknown",
+            username: session?.user.username as string,
+          },
+        };
+        setComments((prev = []) => [...prev, newComment]);
       }
     } catch (error: any) {
       console.log(error);
@@ -49,7 +65,7 @@ export default function CommentTab({ postId }: commentSectionProp) {
       if (res) {
         console.log(res);
         setComments(res.data.data);
-        setCommentCount(res.data.data.commentCount);
+        setCommentCount(res.data.commentCount);
         setRendered(true);
       }
     } catch (error: any) {
@@ -89,19 +105,30 @@ export default function CommentTab({ postId }: commentSectionProp) {
       {/* Comments or Skeleton */}
       {rendered ? (
         <div className="flex flex-col gap-4">
-          {comments.length === 0 ? (
+          {Array.isArray(comments) && comments.length === 0 ? (
             <p className="text-gray-500 dark:text-gray-400 text-center">
               No comments yet.
             </p>
           ) : (
-            comments.map((comment) => (
+            comments?.map((comment) => (
               <div
                 key={comment._id}
-                className="flex items-center space-x-4 p-2 border-b border-gray-200 dark:border-gray-700"
+                className="flex items-start gap-3 p-3 rounded-xl bg-gray-100 dark:bg-gray-700 shadow-sm"
               >
-                <Skeleton className="h-12 w-12 rounded-full bg-gray-700" />
-                <div className="space-y-1">
-                  <p className="text-gray-800 dark:text-gray-200">
+                {/* Avatar */}
+                <div className="h-12 w-12 flex items-center justify-center rounded-full bg-blue-500 text-white font-semibold">
+                  {comment.owner.username.charAt(0).toUpperCase()}
+                </div>
+
+                {/* Comment body */}
+                <div className="flex flex-col">
+                  {/* Username */}
+                  <span className="font-medium text-gray-900 dark:text-gray-100">
+                    {comment.owner.username}
+                  </span>
+
+                  {/* Content */}
+                  <p className="mt-1 text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 px-4 py-2 rounded-lg shadow">
                     {comment.content}
                   </p>
                 </div>

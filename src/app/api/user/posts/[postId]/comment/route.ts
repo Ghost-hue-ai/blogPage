@@ -49,6 +49,7 @@ export async function POST(req: Request, { params }: { params: Params }) {
       {
         message: "successfully created a comment",
         success: true,
+        data: comment,
       },
       { status: 200 }
     );
@@ -100,7 +101,7 @@ export async function GET(req: Request, { params }: { params: Params }) {
       },
       {
         $lookup: {
-          from: " users",
+          from: "users",
           let: { userId: "$owner" },
           pipeline: [
             {
@@ -118,6 +119,7 @@ export async function GET(req: Request, { params }: { params: Params }) {
           as: "owner",
         },
       },
+      { $unwind: "$owner" },
     ]);
 
     if (comments.length === 0) {
