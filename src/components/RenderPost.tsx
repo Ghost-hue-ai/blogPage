@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import axios from "axios";
 import { Skeleton } from "@/components/ui/skeleton";
 import CommentTab from "./CommentTab";
+import { usePathname } from "next/navigation";
 interface CreatedObject {
   createdAt: string;
 }
@@ -23,6 +24,9 @@ interface Post {
 }
 
 export default function RenderPost() {
+  const [currentUrl, setCurrentUrl] = useState("");
+  console.log(window.location.href);
+
   const [posts, setPosts] = useState<Post[]>([]);
   const [rendered, setRendered] = useState(false);
   const [commentTabVisible, setCommentTabVisible] = useState(false);
