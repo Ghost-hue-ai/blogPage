@@ -5,6 +5,19 @@ import axios from "axios";
 import { Skeleton } from "@/components/ui/skeleton";
 import CommentTab from "./CommentTab";
 import { usePathname } from "next/navigation";
+import { Button } from "./ui/button";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 interface CreatedObject {
   createdAt: string;
 }
@@ -23,10 +36,46 @@ interface Post {
   likesCount: number;
 }
 
-export default function RenderPost() {
-  const [currentUrl, setCurrentUrl] = useState("");
-  console.log(window.location.href);
+export async function likePost(id: string) {
+  try {
+    const res = await axios.post(`/api/user/posts/${id}/likes`);
+    if (res) {
+      console.log(res);
+    }
+  } catch (error: any) {
+    console.log(error);
+    const message =
+      error.response?.data?.error || // if server sends an error object
+      error.response?.data?.message || // or a message string
+      error.message || // fallback
+      "Something went wrong";
 
+    toast("Failed to like the post", {
+      description: message,
+    });
+  }
+}
+
+export async function deleteLike(id: string) {
+  try {
+    const res = await axios.delete(`/api/user/posts/${id}/likes`);
+    if (res) {
+      console.log(res);
+    }
+  } catch (error: any) {
+    console.log(error);
+    const message =
+      error.response?.data?.error || // if server sends an error object
+      error.response?.data?.message || // or a message string
+      error.message || // fallback
+      "Something went wrong";
+
+    toast("Failed to delete like on the post", {
+      description: message,
+    });
+  }
+}
+export default function RenderPost() {
   const [posts, setPosts] = useState<Post[]>([]);
   const [rendered, setRendered] = useState(false);
   const [commentTabVisible, setCommentTabVisible] = useState(false);
@@ -61,46 +110,6 @@ export default function RenderPost() {
       });
     }
   };
-
-  async function likePost(id: string) {
-    try {
-      const res = await axios.post(`/api/user/posts/${id}/likes`);
-      if (res) {
-        console.log(res);
-      }
-    } catch (error: any) {
-      console.log(error);
-      const message =
-        error.response?.data?.error || // if server sends an error object
-        error.response?.data?.message || // or a message string
-        error.message || // fallback
-        "Something went wrong";
-
-      toast("Failed to like the post", {
-        description: message,
-      });
-    }
-  }
-
-  async function deleteLike(id: string) {
-    try {
-      const res = await axios.delete(`/api/user/posts/${id}/likes`);
-      if (res) {
-        console.log(res);
-      }
-    } catch (error: any) {
-      console.log(error);
-      const message =
-        error.response?.data?.error || // if server sends an error object
-        error.response?.data?.message || // or a message string
-        error.message || // fallback
-        "Something went wrong";
-
-      toast("Failed to delete like on the post", {
-        description: message,
-      });
-    }
-  }
 
   //TODO : To use skeleton instead of ...loading you already downloaded skeleton form scad cn just use it and if possible optimize the ui change
 
@@ -227,7 +236,6 @@ export default function RenderPost() {
                     </svg>
                     <span className="text-sm font-medium">Like</span>
                   </button>
-
                   {/* Comment button */}
                   <button
                     className="flex items-center gap-2 px-5 py-2 rounded-xl text-gray-600 hover:text-blue-600 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200"
@@ -258,11 +266,41 @@ export default function RenderPost() {
                     </svg>
                     Comment
                   </button>
-
-                  {/* Share button */}
-                  <button className="flex items-center gap-2 px-5 py-2 rounded-xl text-gray-600 hover:text-blue-600 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200">
-                    Share
-                  </button>
+                  {/* Share button */}{" "}
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <button className="flex items-center gap-2 px-5 py-2 rounded-xl text-gray-600 hover:text-blue-600 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200">
+                        Share
+                      </button>
+                    </DialogTrigger>
+                    <DialogContent className="sm:max-w-md">
+                      <DialogHeader>
+                        <DialogTitle>Share link</DialogTitle>
+                        <DialogDescription>
+                          Anyone who has this link will be able to view this.
+                        </DialogDescription>
+                      </DialogHeader>
+                      <div className="flex items-center gap-2">
+                        <div className="grid flex-1 gap-2">
+                          <Label htmlFor="link" className="sr-only">
+                            Link
+                          </Label>
+                          <Input
+                            id="link"
+                            defaultValue={`https://localhost:3000/home/${post._id}`}
+                            readOnly
+                          />
+                        </div>
+                      </div>
+                      <DialogFooter className="sm:justify-start">
+                        <DialogClose asChild>
+                          <Button type="button" variant="secondary">
+                            Close
+                          </Button>
+                        </DialogClose>
+                      </DialogFooter>
+                    </DialogContent>
+                  </Dialog>
                 </div>
               </div>
             </div>

@@ -21,7 +21,7 @@ export async function GET(req: Request, { params }: { params: Params }) {
         { status: 401 }
       );
     }
-
+    const currentUserId = new mongoose.Types.ObjectId(session.user._id);
     const { postId } = params;
 
     const post = await PostModel.aggregate([
@@ -42,12 +42,54 @@ export async function GET(req: Request, { params }: { params: Params }) {
             },
             {
               $project: {
+                _id: 1,
                 username: 1,
-                email: 1,
               },
             },
           ],
           as: "owner",
+        },
+      },
+      {
+        $lookup: {
+          from: "likes",
+          let: { postId: "$_id" },
+          pipeline: [
+            {
+              $match: {
+                $expr: { $eq: ["$post", "$$postId"] },
+              },
+            },
+          ],
+          as: "likes",
+        },
+      },
+      { $addFields: { likesCount: { $size: "$likes" } } },
+      { $unwind: "$owner" },
+      {
+        $lookup: {
+          from: "likes",
+          let: { postId: "$_id" },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $and: [
+                    { $eq: ["$post", "$$postId"] },
+                    { $eq: ["$owner", currentUserId] },
+                  ],
+                },
+              },
+            },
+          ],
+          as: "isLikedByCurrentUser",
+        },
+      },
+      {
+        $addFields: {
+          isLikedByCurrentUser: {
+            $gt: [{ $size: "$isLikedByCurrentUser" }, 0],
+          },
         },
       },
     ]);
