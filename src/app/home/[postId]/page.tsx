@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import CommentTab from "@/components/CommentTab";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   Dialog,
   DialogClose,
@@ -117,11 +118,14 @@ export default function PostPage() {
             <div className="px-5 py-4">
               {/* User info */}
               <div className="flex items-center gap-3 mb-3">
-                <img
-                  src="https://cdn-icons-png.flaticon.com/512/847/847969.png"
-                  alt="User Icon"
-                  className="h-11 w-11 rounded-full border border-gray-300 dark:border-gray-600"
-                />
+                <Avatar>
+                  <AvatarImage
+                    src="https://github.com/shadcn.png"
+                    alt="@shadcn"
+                  />
+                  <AvatarFallback>CN</AvatarFallback>
+                </Avatar>
+
                 <div>
                   <p className="font-semibold text-gray-800 dark:text-gray-100">
                     {post.owner.username}
@@ -159,7 +163,7 @@ export default function PostPage() {
               {/* Stats */}
               <div className="flex justify-between items-center mb-3 text-gray-600 dark:text-gray-300 text-sm font-medium">
                 <span>👍 ❤️ {post.likesCount}</span>
-                <span>32 comments</span>
+                <span></span>
               </div>
 
               {/* Actions */}
@@ -255,7 +259,7 @@ export default function PostPage() {
                         </Label>
                         <Input
                           id="link"
-                          defaultValue={`https://localhost:3000/home/${post._id}`}
+                          defaultValue={`http://localhost:3000/home/${post._id}`}
                           readOnly
                         />
                       </div>
