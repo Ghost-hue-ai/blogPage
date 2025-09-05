@@ -19,6 +19,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useSidebar } from "@/contexts/SidebarContext";
 interface CreatedObject {
   createdAt: string;
 }
@@ -81,6 +82,7 @@ export default function RenderPost() {
   const [rendered, setRendered] = useState(false);
   const [commentTabVisible, setCommentTabVisible] = useState(false);
   const [commentProp, setCommentProp] = useState("");
+  const { isCollapsed } = useSidebar();
 
   const fetchAllPost = async () => {
     console.log("inside the fetchAllPost function");
@@ -118,7 +120,7 @@ export default function RenderPost() {
     (async () => await fetchAllPost())();
   }, []);
   return (
-    <div className="ml-[300px] relative mt-16 flex flex-col justify-center p-6 bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 min-h-screen">
+    <div className={`${isCollapsed ? 'ml-[80px]' : 'ml-[300px]'} relative mt-16 flex flex-col justify-center p-6 bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 min-h-screen transition-all duration-300 ease-in-out`}>
       {commentTabVisible ? <CommentTab postId={commentProp} /> : ""}
       <div className="flex flex-col gap-6 max-w-2xl mx-auto w-full">
         {rendered ? (

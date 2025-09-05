@@ -6,6 +6,7 @@ import axios from "axios";
 import { toast } from "sonner";
 import { useForm } from "react-hook-form";
 import { useSession } from "next-auth/react";
+import { useSidebar } from "@/contexts/SidebarContext";
 type commentSectionProp = {
   postId: string;
 };
@@ -28,6 +29,7 @@ export default function CommentTab({ postId }: commentSectionProp) {
   const [comments, setComments] = useState<Comment[]>([]);
   const [commentCount, setCommentCount] = useState(0);
   const { register, handleSubmit } = useForm<FormData>();
+  const { isCollapsed } = useSidebar();
 
   async function createComment(data: FormData) {
     try {
@@ -86,7 +88,7 @@ export default function CommentTab({ postId }: commentSectionProp) {
     (async () => await fetchComments())();
   }, [postId]);
   return (
-    <div className="overflow-y-auto z-10 fixed top-20 right-6 w-96 h-[calc(100vh-6rem)] backdrop-blur-xl bg-white/90 dark:bg-gray-900/90 border border-white/20 dark:border-gray-700/30 rounded-3xl shadow-2xl flex flex-col">
+    <div className={`overflow-y-auto z-10 fixed top-20 ${isCollapsed ? 'right-6' : 'right-6'} w-96 h-[calc(100vh-6rem)] backdrop-blur-xl bg-white/90 dark:bg-gray-900/90 border border-white/20 dark:border-gray-700/30 rounded-3xl shadow-2xl flex flex-col transition-all duration-300 ease-in-out`}>
       {/* Header */}
       <div className="sticky top-0 z-10 p-6 pb-4 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm border-b border-gray-200/50 dark:border-gray-700/30 rounded-t-3xl">
         <div className="flex items-center justify-between mb-4">
