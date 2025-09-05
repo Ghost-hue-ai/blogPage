@@ -4,7 +4,12 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useSidebar } from "@/contexts/SidebarContext";
-
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { signOut } from "next-auth/react";
 interface SidebarProps {
   className?: string;
 }
@@ -368,21 +373,26 @@ export default function Sidebar({ className = "" }: SidebarProps) {
                   View your profile
                 </p>
               </div>
-              <button className="p-2 rounded-lg hover:bg-gray-200/50 dark:hover:bg-gray-600/30 transition-colors">
-                <svg
-                  className="w-4 h-4 text-gray-500 dark:text-gray-400"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"
-                  />
-                </svg>
-              </button>
+              <Popover>
+                <PopoverTrigger className="p-2 rounded-lg hover:bg-gray-200/50 dark:hover:bg-gray-600/30 transition-colors">
+                  <svg
+                    className="w-4 h-4 text-gray-500 dark:text-gray-400"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"
+                    />
+                  </svg>
+                </PopoverTrigger>
+                <PopoverContent>
+                  <button onClick={() => signOut()}>signOout</button>
+                </PopoverContent>
+              </Popover>
             </>
           )}
         </div>

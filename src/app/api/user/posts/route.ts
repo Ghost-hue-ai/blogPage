@@ -74,6 +74,32 @@ export async function GET(req: Request) {
       {
         $match: { _id: { $exists: true } },
       },
+
+      {
+        $lookup: {
+          from: "requests",
+          let: { receiver: "$owner" },
+          pipeline: [
+            {
+              $match: {
+                $and: [
+                  { $expr: { $eq: ["$RequestReceiver", "$$receiver"] } },
+                  { $expr: { $eq: ["$RequestSender", currentUserId] } },
+                  { status: "SEND" },
+                ],
+              },
+            },
+          ],
+          as: "isFriendWithUser",
+        },
+      },
+      {
+        $addFields: {
+          isFriendWithUser: {
+            $gt: [{ $size: "$isFriendWithUser" }, 0],
+          },
+        },
+      },
       {
         $lookup: {
           from: "users",

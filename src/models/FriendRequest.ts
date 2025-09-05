@@ -23,6 +23,7 @@ const friendRequestSchema: Schema<Request> = new Schema(
     },
     accepted: {
       type: String,
+      enum: ["PENDING", "ACCEPTED", "REJECTED"],
       default: "PENDING",
     },
   },

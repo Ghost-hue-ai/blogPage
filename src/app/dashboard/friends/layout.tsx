@@ -1,5 +1,12 @@
-import React from "react";
-
-export default function layout() {
-  return <div>layout</div>;
+// dashboard/layout.tsx
+export default function FriendsLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <div>
+      <main>{children}</main> {/* MUST include children */}
+    </div>
+  );
 }

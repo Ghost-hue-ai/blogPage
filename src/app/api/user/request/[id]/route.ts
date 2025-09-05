@@ -60,6 +60,13 @@ export async function POST(req: Request, { params }: { params: Params }) {
       RequestReceiver: receiverId,
     });
     await request.save();
+    return Response.json(
+      {
+        message: "successfully sent friend request",
+        success: true,
+      },
+      { status: 200 }
+    );
   } catch (error: any) {
     return Response.json(
       {
@@ -135,6 +142,7 @@ export async function PATCH(req: Request, { params }: { params: Params }) {
         { status: 401 }
       );
     }
+    const { accepted } = await req.json();
 
     const requestReceiver = session.user._id;
 
@@ -156,7 +164,7 @@ export async function PATCH(req: Request, { params }: { params: Params }) {
         RequestSender: new mongoose.Types.ObjectId(requestSender),
       },
       {
-        accepted: "ACCEPTED",
+        accepted,
       },
       { new: true }
     );
@@ -173,7 +181,8 @@ export async function PATCH(req: Request, { params }: { params: Params }) {
 
     return Response.json(
       {
-        message: "successfully accepted friend request",
+        message: "successfully updated friend request",
+        data: request,
         success: true,
       },
       { status: 200 }
@@ -182,6 +191,84 @@ export async function PATCH(req: Request, { params }: { params: Params }) {
     return Response.json(
       {
         error: error.message || "failed to updated request",
+        success: false,
+      },
+      { status: 500 }
+    );
+  }
+}
+
+export async function GET(req: Request, { params }: { params: Params }) {
+  await dbConnect();
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session) {
+      return Response.json(
+        {
+          error: "unauthorized request",
+          success: false,
+        },
+        { status: 401 }
+      );
+    }
+    const receiverId = params.id;
+
+    const requests = await RequestModel.aggregate([
+      {
+        $match: {
+          RequestReceiver: new mongoose.Types.ObjectId(receiverId),
+          accepted: "PENDING",
+        },
+      },
+      {
+        $lookup: {
+          from: "users",
+          let: { requestSender: "$RequestSender" },
+          pipeline: [
+            {
+              $match: {
+                $expr: { $eq: ["$_id", "$$requestSender"] },
+              },
+            },
+            {
+              $project: {
+                _id: 1,
+                username: 1,
+              },
+            },
+          ],
+          as: "RequestSender",
+        },
+      },
+      {
+        $unwind: "$RequestSender",
+      },
+    ]);
+
+    if (requests.length === 0) {
+      return Response.json(
+        {
+          message: "no friend request",
+          data: [],
+          success: true,
+        },
+        { status: 200 }
+      );
+    }
+
+    return Response.json(
+      {
+        message: "friend request fetched successfully",
+        data: requests,
+        success: true,
+      },
+      { status: 200 }
+    );
+  } catch (error: any) {
+    return Response.json(
+      {
+        error: error.message,
+        errorObj: error,
         success: false,
       },
       { status: 500 }

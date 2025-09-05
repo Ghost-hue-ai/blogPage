@@ -6,6 +6,7 @@ interface Post extends Document {
   owner: Schema.Types.ObjectId;
   isLikedByCurrentUser: mongoose.Schema.Types.ObjectId;
   likes: mongoose.Schema.Types.ObjectId;
+  isFriendWithUser: boolean;
 }
 
 const postSchema: Schema<Post> = new Schema(
@@ -28,6 +29,10 @@ const postSchema: Schema<Post> = new Schema(
       ref: "Like",
     },
     likes: [{ type: mongoose.Schema.Types.ObjectId, ref: "likes" }],
+    isFriendWithUser: {
+      type: Boolean,
+      default: false,
+    },
   },
   { timestamps: true }
 );

@@ -6,6 +6,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import CommentTab from "./CommentTab";
 import { usePathname } from "next/navigation";
 import { Button } from "./ui/button";
+
 import {
   Dialog,
   DialogClose,
@@ -20,11 +21,19 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useSidebar } from "@/contexts/SidebarContext";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+
+import { useSession } from "next-auth/react";
 interface CreatedObject {
   createdAt: string;
 }
 
 interface Owner {
+  _id: string;
   username: string;
 }
 interface Post {
@@ -36,6 +45,7 @@ interface Post {
   likes: object;
   isLikedByCurrentUser: boolean;
   likesCount: number;
+  isFriendWithUser: boolean;
 }
 
 export async function likePost(id: string) {
@@ -55,6 +65,22 @@ export async function likePost(id: string) {
     toast("Failed to like the post", {
       description: message,
     });
+  }
+}
+export async function sendFriendRequest(id: string) {
+  try {
+    const res = await axios.post(`/api/user/request/${id}`);
+    if (res.status >= 200 && res.status < 300) {
+      console.log(res);
+      toast("Friend request sent");
+    }
+  } catch (error: any) {
+    const message =
+      error.response?.data?.error ||
+      error.response?.data?.message ||
+      error.message ||
+      "something went wrong";
+    console.log(error);
   }
 }
 
@@ -78,11 +104,13 @@ export async function deleteLike(id: string) {
   }
 }
 export default function RenderPost() {
+  const { data: session, status } = useSession();
   const [posts, setPosts] = useState<Post[]>([]);
   const [rendered, setRendered] = useState(false);
   const [commentTabVisible, setCommentTabVisible] = useState(false);
   const [commentProp, setCommentProp] = useState("");
   const { isCollapsed } = useSidebar();
+  const [disabledIds, setDisabledIds] = useState(new Set());
 
   const fetchAllPost = async () => {
     console.log("inside the fetchAllPost function");
@@ -120,14 +148,16 @@ export default function RenderPost() {
     (async () => await fetchAllPost())();
   }, []);
   return (
-    <div className={`${isCollapsed ? 'ml-[80px]' : 'ml-[300px]'} relative mt-16 flex flex-col justify-center p-6 bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 min-h-screen transition-all duration-300 ease-in-out`}>
+    <div
+      className={`${isCollapsed ? "ml-[80px]" : "ml-[300px]"} relative mt-16 flex flex-col justify-center p-6 bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 min-h-screen transition-all duration-300 ease-in-out`}
+    >
       {commentTabVisible ? <CommentTab postId={commentProp} /> : ""}
       <div className="flex flex-col gap-6 max-w-2xl mx-auto w-full">
         {rendered ? (
           posts.map((post) => (
             <article
               key={post._id}
-              className="group relative flex flex-col bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-white/20 dark:border-gray-700/30 rounded-3xl shadow-xl hover:shadow-2xl hover:scale-[1.02] transition-all duration-500 overflow-hidden"
+              className="group relative flex flex-col bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-white/20 dark:border-gray-700/30 rounded-3xl shadow-xl hover:shadow-2xl  transition-all duration-500 overflow-hidden"
             >
               {/* Media/Image */}
               <div className="relative bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 dark:from-gray-700 dark:via-gray-600 dark:to-gray-800 h-80 flex items-center justify-center overflow-hidden">
@@ -160,16 +190,49 @@ export default function RenderPost() {
                 <div className="flex items-center gap-4 mb-4">
                   <div className="relative">
                     <div className="absolute -inset-0.5 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full opacity-75 group-hover:opacity-100 transition duration-300 blur-sm"></div>
-                    <Avatar className="relative h-12 w-12 border-2 border-white dark:border-gray-800">
-                      <AvatarImage
-                        src="https://github.com/shadcn.png"
-                        alt="@shadcn"
-                        className="object-cover"
-                      />
-                      <AvatarFallback className="bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold">
-                        CN
-                      </AvatarFallback>
-                    </Avatar>
+                    <Popover>
+                      <PopoverTrigger>
+                        {" "}
+                        <Avatar className="relative hover:scale-110 transition-all h-12 w-12 border-2 border-white dark:border-gray-800">
+                          <AvatarImage
+                            src="https://github.com/shadcn.png"
+                            alt="@shadcn"
+                            className="object-cover"
+                          />
+                          <AvatarFallback className="bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold">
+                            CN
+                          </AvatarFallback>
+                        </Avatar>
+                      </PopoverTrigger>
+                      <PopoverContent className="bg-gray-700">
+                        <div className="flex flex-col space-y-2">
+                          <span className="font-extrabold">
+                            {post.owner.username.slice(0, 1).toUpperCase() +
+                              post.owner.username.slice(1)}
+                          </span>
+                          <span>
+                            {post.isFriendWithUser ? (
+                              "friend"
+                            ) : post.owner._id === session?.user._id ? (
+                              ""
+                            ) : (
+                              <button
+                                onClick={async (e) => {
+                                  await sendFriendRequest(post.owner._id);
+                                  setDisabledIds((prev) =>
+                                    new Set(prev).add(post.owner._id)
+                                  );
+                                }}
+                                disabled={disabledIds.has(post.owner._id)}
+                                className={`rounded-md bg-blue-700 text-white px-2 py-2 border-none ${disabledIds.has(post.owner._id) ? "bg-gray-600 " : "bg-blue-500 hover:bg-blue-600"}`}
+                              >
+                                send request
+                              </button>
+                            )}
+                          </span>
+                        </div>
+                      </PopoverContent>
+                    </Popover>{" "}
                   </div>
 
                   <div className="flex-1">
