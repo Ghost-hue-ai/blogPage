@@ -1,7 +1,10 @@
+"use client";
 import React from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useRouter } from "next/navigation";
 
 export default function Navbar() {
+  const navigate = useRouter();
   return (
     <header className="sticky  top-0 z-50 w-full border-b border-white/10 bg-white/80 backdrop-blur-md dark:bg-gray-900/80 dark:border-gray-800/50">
       <div className="container mx-auto px-6 lg:px-8">
@@ -22,7 +25,10 @@ export default function Navbar() {
           <nav className="hidden md:flex">
             <ul className="flex items-center space-x-2 rounded-full bg-white/20 dark:bg-gray-800/40 backdrop-blur-sm border border-white/20 dark:border-gray-700/50 px-2 py-2 shadow-lg">
               <li>
-                <button className="group relative p-3 rounded-full transition-all duration-200 hover:bg-white/20 dark:hover:bg-gray-700/50 hover:scale-110 active:scale-95">
+                <button
+                  onClick={() => navigate.push("/dashboard")}
+                  className="group relative p-3 rounded-full transition-all duration-200 hover:bg-white/20 dark:hover:bg-gray-700/50 hover:scale-110 active:scale-95"
+                >
                   <img
                     src="https://cdn-icons-png.flaticon.com/512/25/25694.png"
                     alt="home"
@@ -35,7 +41,10 @@ export default function Navbar() {
                 </button>
               </li>
               <li>
-                <button className="group relative p-3 rounded-full transition-all duration-200 hover:bg-white/20 dark:hover:bg-gray-700/50 hover:scale-110 active:scale-95">
+                <button
+                  onClick={() => navigate.push("/dashboard/friends")}
+                  className="group relative p-3 rounded-full transition-all duration-200 hover:bg-white/20 dark:hover:bg-gray-700/50 hover:scale-110 active:scale-95"
+                >
                   <img
                     src="https://cdn-icons-png.flaticon.com/512/880/880594.png"
                     alt="friends"

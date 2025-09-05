@@ -1,4 +1,6 @@
-import React from "react";
+"use client";
+import React, { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 interface SidebarProps {
@@ -6,35 +8,68 @@ interface SidebarProps {
 }
 
 export default function Sidebar({ className = "" }: SidebarProps) {
+  const navigator = useRouter();
+  const [isCollapsed, setIsCollapsed] = useState(false);
+
+  const toggleSidebar = () => {
+    setIsCollapsed(!isCollapsed);
+  };
   return (
     <aside
-      className={`w-[300px] overflow-scroll fixed top-16 left-0 h-[calc(100vh-64px)] bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl border-r border-white/20 dark:border-gray-700/30 flex flex-col ${className}`}
+      className={`${
+        isCollapsed ? "w-[80px]" : "w-[300px]"
+      } overflow-scroll fixed top-0 h-screen left-0 bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl border-r border-white/20 dark:border-gray-700/30 flex flex-col transition-all duration-300 ease-in-out ${className}`}
     >
+      {/* Hamburger Menu */}
+      <div className="p-4 border-b border-gray-200/50 dark:border-gray-700/30">
+        <button
+          onClick={toggleSidebar}
+          className="w-full flex items-center justify-center p-2 rounded-lg hover:bg-gray-100/50 dark:hover:bg-gray-700/30 transition-colors"
+        >
+          <svg
+            className="w-6 h-6 text-gray-600 dark:text-gray-400"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d={isCollapsed ? "M4 6h16M4 12h16M4 18h16" : "M6 18L18 6M6 6l12 12"}
+            />
+          </svg>
+        </button>
+      </div>
+
       {/* Navigation Menu */}
       <nav className="flex-1 p-6">
         <div className="space-y-2">
           {/* Home */}
-          <button className="group w-full flex items-center gap-4 px-4 py-3 rounded-2xl bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
+          <button className={`group w-full flex items-center ${isCollapsed ? 'justify-center px-2' : 'gap-4 px-4'} py-3 rounded-2xl bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105`}>
             <div className="w-8 h-8 flex items-center justify-center">
               <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                 <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
               </svg>
             </div>
-            <span className="font-semibold">Home</span>
+            {!isCollapsed && <span className="font-semibold">Home</span>}
           </button>
 
           {/* Friends */}
-          <button className="group w-full flex items-center gap-4 px-4 py-3 rounded-2xl bg-gray-100/80 dark:bg-gray-700/50 text-gray-700 dark:text-gray-300 hover:bg-green-50 dark:hover:bg-green-900/20 hover:text-green-600 dark:hover:text-green-400 border border-gray-200/50 dark:border-gray-600/30 transition-all duration-300 hover:scale-105">
+          <button
+            onClick={() => navigator.push("/dashboard/friends")}
+            className={`group w-full flex items-center ${isCollapsed ? 'justify-center px-2' : 'gap-4 px-4'} py-3 rounded-2xl bg-gray-100/80 dark:bg-gray-700/50 text-gray-700 dark:text-gray-300 hover:bg-green-50 dark:hover:bg-green-900/20 hover:text-green-600 dark:hover:text-green-400 border border-gray-200/50 dark:border-gray-600/30 transition-all duration-300 hover:scale-105`}
+          >
             <div className="w-8 h-8 flex items-center justify-center">
               <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                 <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z" />
               </svg>
             </div>
-            <span className="font-semibold">Friends</span>
+            {!isCollapsed && <span className="font-semibold">Friends</span>}
           </button>
 
           {/* Messages */}
-          <button className="group w-full flex items-center gap-4 px-4 py-3 rounded-2xl bg-gray-100/80 dark:bg-gray-700/50 text-gray-700 dark:text-gray-300 hover:bg-purple-50 dark:hover:bg-purple-900/20 hover:text-purple-600 dark:hover:text-purple-400 border border-gray-200/50 dark:border-gray-600/30 transition-all duration-300 hover:scale-105">
+          <button className={`group w-full flex items-center ${isCollapsed ? 'justify-center px-2' : 'gap-4 px-4'} py-3 rounded-2xl bg-gray-100/80 dark:bg-gray-700/50 text-gray-700 dark:text-gray-300 hover:bg-purple-50 dark:hover:bg-purple-900/20 hover:text-purple-600 dark:hover:text-purple-400 border border-gray-200/50 dark:border-gray-600/30 transition-all duration-300 hover:scale-105 relative`}>
             <div className="w-8 h-8 flex items-center justify-center">
               <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                 <path
@@ -44,8 +79,8 @@ export default function Sidebar({ className = "" }: SidebarProps) {
                 />
               </svg>
             </div>
-            <span className="font-semibold">Messages</span>
-            <div className="ml-auto">
+            {!isCollapsed && <span className="font-semibold">Messages</span>}
+            <div className={`${isCollapsed ? 'absolute -top-1 -right-1' : 'ml-auto'}`}>
               <span className="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-white bg-red-500 rounded-full">
                 3
               </span>
@@ -53,13 +88,13 @@ export default function Sidebar({ className = "" }: SidebarProps) {
           </button>
 
           {/* Notifications */}
-          <button className="group w-full flex items-center gap-4 px-4 py-3 rounded-2xl bg-gray-100/80 dark:bg-gray-700/50 text-gray-700 dark:text-gray-300 hover:bg-yellow-50 dark:hover:bg-yellow-900/20 hover:text-yellow-600 dark:hover:text-yellow-400 border border-gray-200/50 dark:border-gray-600/30 transition-all duration-300 hover:scale-105">
+          <button className={`group w-full flex items-center ${isCollapsed ? 'justify-center px-2' : 'gap-4 px-4'} py-3 rounded-2xl bg-gray-100/80 dark:bg-gray-700/50 text-gray-700 dark:text-gray-300 hover:bg-yellow-50 dark:hover:bg-yellow-900/20 hover:text-yellow-600 dark:hover:text-yellow-400 border border-gray-200/50 dark:border-gray-600/30 transition-all duration-300 hover:scale-105`}>
             <div className="w-8 h-8 flex items-center justify-center">
               <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                 <path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z" />
               </svg>
             </div>
-            <span className="font-semibold">Notifications</span>
+            {!isCollapsed && <span className="font-semibold">Notifications</span>}
           </button>
 
           {/* Bookmarks */}
