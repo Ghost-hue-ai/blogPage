@@ -82,24 +82,27 @@ export async function GET(req: Request) {
           pipeline: [
             {
               $match: {
-                $and: [
-                  { $expr: { $eq: ["$RequestReceiver", "$$receiver"] } },
-                  { $expr: { $eq: ["$RequestSender", currentUserId] } },
-                  { status: "SEND" },
+                $or: [
+                  {
+                    $and: [
+                      { $expr: { $eq: ["$RequestReceiver", "$$receiver"] } },
+                      { $expr: { $eq: ["$RequestSender", currentUserId] } },
+                    ],
+                  },
+                  {
+                    $and: [
+                      { $expr: { $eq: ["$RequestReceiver", currentUserId] } },
+                      { $expr: { $eq: ["$RequestSender", "$$receiver"] } },
+                    ],
+                  },
                 ],
               },
             },
           ],
-          as: "isFriendWithUser",
+          as: "friends",
         },
       },
-      {
-        $addFields: {
-          isFriendWithUser: {
-            $gt: [{ $size: "$isFriendWithUser" }, 0],
-          },
-        },
-      },
+      { $unwind: { path: "$friends", preserveNullAndEmptyArrays: true } }, //TODO : unwind removes the entire document if it found an empty array but wit preserveNullAndEmptyArrays it keeps the null array too
       {
         $lookup: {
           from: "users",

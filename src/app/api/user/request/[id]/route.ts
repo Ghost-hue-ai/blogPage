@@ -58,6 +58,7 @@ export async function POST(req: Request, { params }: { params: Params }) {
     const request = new RequestModel({
       RequestSender: sender,
       RequestReceiver: receiverId,
+      status: "PENDING",
     });
     await request.save();
     return Response.json(
@@ -142,7 +143,7 @@ export async function PATCH(req: Request, { params }: { params: Params }) {
         { status: 401 }
       );
     }
-    const { accepted } = await req.json();
+    const { status } = await req.json();
 
     const requestReceiver = session.user._id;
 
@@ -164,7 +165,7 @@ export async function PATCH(req: Request, { params }: { params: Params }) {
         RequestSender: new mongoose.Types.ObjectId(requestSender),
       },
       {
-        accepted,
+        status,
       },
       { new: true }
     );
@@ -217,7 +218,7 @@ export async function GET(req: Request, { params }: { params: Params }) {
       {
         $match: {
           RequestReceiver: new mongoose.Types.ObjectId(receiverId),
-          accepted: "PENDING",
+          status: "PENDING",
         },
       },
       {

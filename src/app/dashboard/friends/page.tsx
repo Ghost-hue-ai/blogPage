@@ -23,7 +23,7 @@ interface FriendRequestDocument {
 export async function declineRequest(id: string) {
   try {
     const res = await axios.patch(`/api/user/request/${id}`, {
-      accepted: "REJECTED",
+      status: "REJECTED",
     });
     if (res) {
       console.log(res);
@@ -44,7 +44,7 @@ export async function declineRequest(id: string) {
 export async function acceptRequest(id: string) {
   try {
     const res = await axios.patch(`/api/user/request/${id}`, {
-      accepted: "ACCEPTED",
+      status: "ACCEPTED",
     });
     if (res) {
       console.log(res);

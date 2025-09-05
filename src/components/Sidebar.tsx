@@ -13,8 +13,10 @@ import { signOut } from "next-auth/react";
 interface SidebarProps {
   className?: string;
 }
+import { useSession } from "next-auth/react";
 
 export default function Sidebar({ className = "" }: SidebarProps) {
+  const { data: session, status } = useSession();
   const pathname = usePathname();
   const { isCollapsed, toggleSidebar } = useSidebar();
   const [mounted, setMounted] = useState(false);
@@ -367,7 +369,7 @@ export default function Sidebar({ className = "" }: SidebarProps) {
             <>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">
-                  Your Profile
+                  {session?.user.username}
                 </p>
                 <p className="text-xs text-gray-500 dark:text-gray-400">
                   View your profile

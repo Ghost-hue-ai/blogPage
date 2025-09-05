@@ -31,7 +31,10 @@ import { useSession } from "next-auth/react";
 interface CreatedObject {
   createdAt: string;
 }
-
+interface FriendDocument {
+  _id: string;
+  status: string;
+}
 interface Owner {
   _id: string;
   username: string;
@@ -45,7 +48,7 @@ interface Post {
   likes: object;
   isLikedByCurrentUser: boolean;
   likesCount: number;
-  isFriendWithUser: boolean;
+  friends: FriendDocument;
 }
 
 export async function likePost(id: string) {
@@ -93,9 +96,9 @@ export async function deleteLike(id: string) {
   } catch (error: any) {
     console.log(error);
     const message =
-      error.response?.data?.error || // if server sends an error object
-      error.response?.data?.message || // or a message string
-      error.message || // fallback
+      error.response?.data?.error ||
+      error.response?.data?.message ||
+      error.message ||
       "Something went wrong";
 
     toast("Failed to delete like on the post", {
@@ -141,8 +144,6 @@ export default function RenderPost() {
       });
     }
   };
-
-  //TODO : To use skeleton instead of ...loading you already downloaded skeleton form scad cn just use it and if possible optimize the ui change
 
   useEffect(() => {
     (async () => await fetchAllPost())();
@@ -211,23 +212,25 @@ export default function RenderPost() {
                               post.owner.username.slice(1)}
                           </span>
                           <span>
-                            {post.isFriendWithUser ? (
-                              "friend"
-                            ) : post.owner._id === session?.user._id ? (
-                              ""
+                            {post.friends ? (
+                              post.friends.status == "ACCEPTED" ? (
+                                "friends"
+                              ) : post.friends.status == "PENDING" ? (
+                                "request sent"
+                              ) : (post.friends.status == "REJECTED" || null) &&
+                                post.owner._id !== session?.user._id ? (
+                                <button
+                                  onClick={async () =>
+                                    await sendFriendRequest(post.owner._id)
+                                  }
+                                >
+                                  send request
+                                </button>
+                              ) : (
+                                ""
+                              )
                             ) : (
-                              <button
-                                onClick={async (e) => {
-                                  await sendFriendRequest(post.owner._id);
-                                  setDisabledIds((prev) =>
-                                    new Set(prev).add(post.owner._id)
-                                  );
-                                }}
-                                disabled={disabledIds.has(post.owner._id)}
-                                className={`rounded-md bg-blue-700 text-white px-2 py-2 border-none ${disabledIds.has(post.owner._id) ? "bg-gray-600 " : "bg-blue-500 hover:bg-blue-600"}`}
-                              >
-                                send request
-                              </button>
+                              ""
                             )}
                           </span>
                         </div>
