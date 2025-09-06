@@ -1,11 +1,20 @@
 "use client";
-import React,{useState} from "react";
-import { useSession, signIn, signOut } from "next-auth/react";
+import React, { useState } from "react";
+import { signIn, signOut } from "next-auth/react";
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardAction,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 
 type FormType = {
   Email: string;
@@ -15,10 +24,15 @@ type FormType = {
 export default function Page() {
   const [resError, setResError] = useState<string | null>(null);
   const router = useRouter();
-  const { data: session } = useSession();
-  const { register, handleSubmit, formState: { errors } } = useForm<FormType>();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<FormType>();
 
   const onSubmit = async (data: FormType) => {
+    console.log("btn clicked");
+
     const { Email: email, Password: password } = data;
 
     try {
@@ -47,37 +61,65 @@ export default function Page() {
   };
 
   return (
-    <div className="max-w-sm mx-auto mt-10">
-      {resError && <p className="text-red-500 mb-2">{resError}</p>}
-
-      <form onSubmit={handleSubmit(onSubmit)} className="grid gap-4">
-        <div className="flex flex-col gap-1">
-          <Label htmlFor="email">Email</Label>
-          <Input
-            id="email"
-            type="email"
-            placeholder="Email"
-            {...register("Email", { required: "This field is required" })}
-          />
-          <p className="text-red-500 text-sm">{errors.Email?.message}</p>
-        </div>
-
-        <div className="flex flex-col gap-1">
-          <Label htmlFor="password">Password</Label>
-          <Input
-            id="password"
-            type="password"
-            placeholder="Password"
-            {...register("Password", { required: "This field is required" })}
-          />
-          <p className="text-red-500 text-sm">{errors.Password?.message}</p>
-        </div>
-
-        <Button type="submit">Sign In</Button>
-        <Button variant="destructive" onClick={() => signOut()}>
-          Sign Out
-        </Button>
-      </form>
+    <div className="flex justify-center items-center w-screen h-screen">
+      <Card className="w-full max-w-sm">
+        <CardHeader>
+          <CardTitle>Login to your account</CardTitle>
+          <CardDescription>
+            Enter your email below to login to your account
+          </CardDescription>
+          <CardAction>
+            <Button variant="link">Sign Up</Button>
+          </CardAction>
+        </CardHeader>
+        <CardContent>
+          {resError && (
+            <div className="mb-4 p-3 text-sm text-red-600 bg-red-50 border border-red-200 rounded-md">
+              {resError}
+            </div>
+          )}
+          <form
+            onSubmit={handleSubmit(onSubmit)}
+            className="flex flex-col gap-6"
+          >
+            <div className="grid gap-2">
+              <Label htmlFor="email">Email</Label>
+              <Input
+                {...register("Email")}
+                id="email"
+                type="email"
+                placeholder="m@example.com"
+                required
+              />
+            </div>
+            <div className="grid gap-2">
+              <div className="flex items-center">
+                <Label htmlFor="password">Password</Label>
+                <a
+                  href="#"
+                  className="ml-auto inline-block text-sm underline-offset-4 hover:underline"
+                >
+                  Forgot your password?
+                </a>
+              </div>
+              <Input
+                id="password"
+                type="password"
+                required
+                {...register("Password")}
+              />
+            </div>
+            <Button type="submit" className="w-full border-2">
+              Login
+            </Button>
+          </form>
+        </CardContent>
+        <CardFooter>
+          <Button variant="outline" className="w-full">
+            Login with Google
+          </Button>
+        </CardFooter>
+      </Card>
     </div>
   );
 }
