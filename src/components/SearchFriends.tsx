@@ -13,6 +13,8 @@ export default function SearchFriends() {
 
     setIsSearching(true);
     try {
+      console.log(searchQuery);
+
       const res = await axios.get(`/api/user/${searchQuery}`);
       if (res) {
         console.log(res);

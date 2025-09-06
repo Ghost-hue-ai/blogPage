@@ -10,6 +10,7 @@ interface User extends Document {
   forgotSecret: string;
   forgotSecretExpiry?: Date;
   verifiedUser?: boolean;
+  profilePic?: String;
 }
 
 const userSchema: Schema<User> = new Schema(
@@ -39,6 +40,7 @@ const userSchema: Schema<User> = new Schema(
     verifySecretExpiry: Date,
     forgotSecret: String,
     forgotSecretExpiry: Date,
+    profilePic: String,
   },
   { timestamps: true }
 );

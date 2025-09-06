@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useSidebar } from "@/contexts/SidebarContext";
+import { useRouter } from "next/navigation";
 import {
   Popover,
   PopoverContent,
@@ -20,6 +21,7 @@ export default function Sidebar({ className = "" }: SidebarProps) {
   const pathname = usePathname();
   const { isCollapsed, toggleSidebar } = useSidebar();
   const [mounted, setMounted] = useState(false);
+  const navigator = useRouter();
 
   useEffect(() => {
     setMounted(true);
@@ -393,6 +395,11 @@ export default function Sidebar({ className = "" }: SidebarProps) {
                 </PopoverTrigger>
                 <PopoverContent>
                   <button onClick={() => signOut()}>signOout</button>
+                  <button
+                    onClick={() => navigator.push("/dashboard/updateProfile")}
+                  >
+                    Update your Profile
+                  </button>
                 </PopoverContent>
               </Popover>
             </>
