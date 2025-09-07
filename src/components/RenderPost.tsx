@@ -38,6 +38,7 @@ interface FriendDocument {
 interface Owner {
   _id: string;
   username: string;
+  profilePic: string;
 }
 interface Post {
   _id: string;
@@ -194,16 +195,29 @@ export default function RenderPost() {
                     <Popover>
                       <PopoverTrigger>
                         {" "}
-                        <Avatar className="relative hover:scale-110 transition-all h-12 w-12 border-2 border-white dark:border-gray-800">
-                          <AvatarImage
-                            src="https://github.com/shadcn.png"
-                            alt="@shadcn"
-                            className="object-cover"
-                          />
-                          <AvatarFallback className="bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold">
-                            CN
-                          </AvatarFallback>
-                        </Avatar>
+                        {post.owner.profilePic ? (
+                          <Avatar className="relative hover:scale-110 transition-all h-12 w-12 border-2 border-white dark:border-gray-800">
+                            <AvatarImage
+                              src={post.owner.profilePic}
+                              alt="@shadcn"
+                              className="object-cover"
+                            />
+                            <AvatarFallback className="bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold">
+                              CN
+                            </AvatarFallback>
+                          </Avatar>
+                        ) : (
+                          <Avatar className="relative hover:scale-110 transition-all h-12 w-12 border-2 border-white dark:border-gray-800">
+                            <AvatarImage
+                              src="https://github.com/shadcn.png"
+                              alt="@shadcn"
+                              className="object-cover"
+                            />
+                            <AvatarFallback className="bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold">
+                              CN
+                            </AvatarFallback>
+                          </Avatar>
+                        )}
                       </PopoverTrigger>
                       <PopoverContent className="bg-gray-700">
                         <div className="flex flex-col space-y-2">

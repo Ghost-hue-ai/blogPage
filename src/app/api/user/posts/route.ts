@@ -112,7 +112,7 @@ export async function GET(req: Request) {
               $match: { $expr: { $eq: ["$_id", "$$userId"] } },
             },
             {
-              $project: { username: 1, _id: 1 },
+              $project: { username: 1, _id: 1, profilePic: 1 },
             },
           ],
           as: "owner",

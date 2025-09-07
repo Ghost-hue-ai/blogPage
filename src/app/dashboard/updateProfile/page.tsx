@@ -125,42 +125,42 @@ export default function UpdateProfilePage() {
     },
   });
 
-  // const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-  //   const file = e.target.files?.[0];
-  //   if (!file) return;
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
 
-  //   setProfileImageState((prev) => ({ ...prev, uploading: true, file }));
-  //   const formData = new FormData();
-  //   formData.append("file", file);
+    setProfileImageState((prev) => ({ ...prev, uploading: true, file }));
+    const formData = new FormData();
+    formData.append("file", file);
 
-  //   try {
-  //     const result = await axios.post("/api/user/upload", formData, {
-  //       headers: {
-  //         "Content-Type": "multipart/form-data",
-  //       },
-  //     });
+    try {
+      const result = await axios.post("/api/user/upload", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
 
-  //     if (result.status >= 200 && result.status < 300) {
-  //       setProfileImageState((prev) => ({
-  //         ...prev,
-  //         url: result.data.url,
-  //         uploading: false,
-  //       }));
-  //       toast("Profile picture updated successfully!");
-  //     }
-  //   } catch (error: any) {
-  //     console.error("Upload failed:", error);
-  //     const message =
-  //       error.response?.data?.message ||
-  //       error.response?.data?.error ||
-  //       error.message ||
-  //       "Something went wrong";
-  //     toast("Failed to update profile pic", {
-  //       description: message,
-  //     });
-  //     setProfileImageState((prev) => ({ ...prev, uploading: false }));
-  //   }
-  // };
+      if (result.status >= 200 && result.status < 300) {
+        setProfileImageState((prev) => ({
+          ...prev,
+          url: result.data.url,
+          uploading: false,
+        }));
+        toast("Profile picture updated successfully!");
+      }
+    } catch (error: any) {
+      console.error("Upload failed:", error);
+      const message =
+        error.response?.data?.message ||
+        error.response?.data?.error ||
+        error.message ||
+        "Something went wrong";
+      toast("Failed to update profile pic", {
+        description: message,
+      });
+      setProfileImageState((prev) => ({ ...prev, uploading: false }));
+    }
+  };
 
   const onSubmit = async (data: ProfileFormData) => {
     try {
@@ -239,11 +239,17 @@ export default function UpdateProfilePage() {
                 )}
               </div>
               <div className="flex flex-col items-center space-y-3">
-                <Label htmlFor="profile-image" className="cursor-pointer">
-                  <Button
-                    type="button"
-                    className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-6 py-2 rounded-full transition-all duration-300 shadow-lg hover:shadow-xl"
-                    disabled={profileImageState.uploading}
+                <div className="relative">
+                  <Input
+                    id="profile-image"
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={handleImageUpload}
+                  />
+                  <Label
+                    htmlFor="profile-image"
+                    className="cursor-pointer inline-flex items-center justify-center bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-6 py-2 rounded-full transition-all duration-300 shadow-lg hover:shadow-xl"
                   >
                     {profileImageState.uploading ? (
                       <>
@@ -256,15 +262,8 @@ export default function UpdateProfilePage() {
                         Change Picture
                       </>
                     )}
-                  </Button>
-                </Label>
-                <Input
-                  id="profile-image"
-                  type="file"
-                  accept="image/*"
-                  className="hidden"
-                  // onChange={handleImageUpload}
-                />
+                  </Label>
+                </div>
                 <p className="text-sm text-gray-500 bg-gray-50 px-3 py-1 rounded-full">
                   JPG, PNG, GIF up to 10MB
                 </p>
