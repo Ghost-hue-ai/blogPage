@@ -7,6 +7,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { useEffect } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { toast } from "sonner";
 import React, { useState } from "react";
@@ -22,12 +23,18 @@ interface FormData {
   heading: string;
   description: string;
 }
+interface UserDocument {
+  username: string;
+  profilePic: string;
+}
 export default function PublishPost() {
   const { register, handleSubmit } = useForm<FormData>();
+  const { data: session, status } = useSession();
+  const [user, setUser] = useState<UserDocument>();
   const [title, setTitle] = useState("");
   const [des, setDes] = useState("");
   const [responded, setResponded] = useState(false);
-  const { data: session, status } = useSession();
+
   const [liked, setLiked] = useState(false);
   const [postId, setPostId] = useState();
   const { isCollapsed } = useSidebar();
@@ -116,7 +123,21 @@ export default function PublishPost() {
       });
     }
   }
+  useEffect(() => {
+    (async () => {
+      try {
+        const res = await axios.get(`/api/user/user-data/${session?.user._id}`);
+        if (res.status >= 200 && res.status < 300) {
+          console.log(session);
+          console.log(res);
 
+          setUser(res.data.data);
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    })();
+  }, [session]);
   if (status === "loading") {
     return <p>Loading...</p>;
   }
@@ -125,23 +146,38 @@ export default function PublishPost() {
     return <p>You must be logged in to publish a post.</p>;
   }
   return (
-    <div className={`${isCollapsed ? 'ml-[80px]' : 'ml-[300px]'} flex flex-col justify-center p-6 bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 min-h-screen transition-all duration-300 ease-in-out`}>
+    <div
+      className={`${isCollapsed ? "ml-[80px]" : "ml-[300px]"} flex flex-col justify-center p-6 bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 min-h-screen transition-all duration-300 ease-in-out`}
+    >
       {/* Modern Post Creation Card */}
       <div className="max-w-2xl mx-auto w-full">
         <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-white/20 dark:border-gray-700/30 rounded-3xl shadow-xl p-6 mb-6">
           <div className="flex items-center gap-4">
             <div className="relative">
               <div className="absolute -inset-0.5 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full opacity-75 blur-sm"></div>
-              <Avatar className="relative h-12 w-12 border-2 border-white dark:border-gray-800">
-                <AvatarImage
-                  src="https://github.com/shadcn.png"
-                  alt="@user"
-                  className="object-cover"
-                />
-                <AvatarFallback className="bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold">
-                  {session?.user?.username?.charAt(0).toUpperCase() || "U"}
-                </AvatarFallback>
-              </Avatar>
+              {user?.profilePic ? (
+                <Avatar className="relative h-12 w-12 border-2 border-white dark:border-gray-800">
+                  <AvatarImage
+                    src={user?.profilePic}
+                    alt="@user"
+                    className="object-cover"
+                  />
+                  <AvatarFallback className="bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold">
+                    {session?.user?.username?.charAt(0).toUpperCase() || "U"}
+                  </AvatarFallback>
+                </Avatar>
+              ) : (
+                <Avatar className="relative h-12 w-12 border-2 border-white dark:border-gray-800">
+                  <AvatarImage
+                    src="https://github.com/shadcn.png"
+                    alt="@user"
+                    className="object-cover"
+                  />
+                  <AvatarFallback className="bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold">
+                    {session?.user?.username?.charAt(0).toUpperCase() || "U"}
+                  </AvatarFallback>
+                </Avatar>
+              )}
             </div>
 
             <Dialog>

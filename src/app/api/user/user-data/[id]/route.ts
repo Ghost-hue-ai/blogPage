@@ -151,3 +151,62 @@ export async function POST(
     );
   }
 }
+
+export async function GET(req: Request, { params }: { params: Params }) {
+  await dbConnect();
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session) {
+      return Response.json(
+        {
+          error: "unauthorized request",
+          success: false,
+        },
+        { status: 401 }
+      );
+    }
+    const userId = params.id;
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+      return Response.json(
+        {
+          error: "invalid userId",
+          success: false,
+        },
+        { status: 400 }
+      );
+    }
+
+    const user = await UserModel.findOne({
+      _id: new mongoose.Types.ObjectId(userId),
+    }).select(
+      "-password -email  -verifySecret -verifySecretExpiry -forgotSecret -forgotSecretExpiry"
+    );
+    if (!user) {
+      return Response.json(
+        {
+          error: "can't find user",
+
+          success: false,
+        },
+        { status: 404 }
+      );
+    }
+
+    return Response.json(
+      {
+        message: "successfully fetched userData",
+        data: user,
+        success: true,
+      },
+      { status: 200 }
+    );
+  } catch (error) {
+    return Response.json(
+      {
+        error: "failed fetching user data",
+        success: false,
+      },
+      { status: 500 }
+    );
+  }
+}

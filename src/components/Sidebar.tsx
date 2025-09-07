@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useSidebar } from "@/contexts/SidebarContext";
 import { useRouter } from "next/navigation";
+import axios from "axios";
 import {
   Popover,
   PopoverContent,
@@ -16,8 +17,14 @@ interface SidebarProps {
 }
 import { useSession } from "next-auth/react";
 
+interface UserDocument {
+  username: string;
+  profilePic: string;
+}
+
 export default function Sidebar({ className = "" }: SidebarProps) {
   const { data: session, status } = useSession();
+  const [user, setUser] = useState<UserDocument>();
   const pathname = usePathname();
   const { isCollapsed, toggleSidebar } = useSidebar();
   const [mounted, setMounted] = useState(false);
@@ -27,6 +34,21 @@ export default function Sidebar({ className = "" }: SidebarProps) {
     setMounted(true);
   }, []);
 
+  useEffect(() => {
+    (async () => {
+      try {
+        const res = await axios.get(`/api/user/user-data/${session?.user._id}`);
+        if (res.status >= 200 && res.status < 300) {
+          console.log(session);
+          console.log(res);
+
+          setUser(res.data.data);
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    })();
+  }, [session]);
   const isActive = (path: string) => pathname === path;
 
   // Prevent hydration mismatch by not rendering dynamic content until mounted
@@ -360,12 +382,21 @@ export default function Sidebar({ className = "" }: SidebarProps) {
         >
           <div className="relative">
             <div className="absolute -inset-0.5 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full opacity-75 blur-sm"></div>
-            <Avatar className="relative h-10 w-10 border-2 border-white dark:border-gray-800">
-              <AvatarImage src="https://github.com/shadcn.png" alt="@user" />
-              <AvatarFallback className="bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold text-sm">
-                U
-              </AvatarFallback>
-            </Avatar>
+            {user?.profilePic ? (
+              <Avatar className="relative h-10 w-10 border-2 border-white dark:border-gray-800">
+                <AvatarImage src={user.profilePic} alt="@user" />
+                <AvatarFallback className="bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold text-sm">
+                  U
+                </AvatarFallback>
+              </Avatar>
+            ) : (
+              <Avatar className="relative h-10 w-10 border-2 border-white dark:border-gray-800">
+                <AvatarImage src="https://github.com/shadcn.png" alt="@user" />
+                <AvatarFallback className="bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold text-sm">
+                  U
+                </AvatarFallback>
+              </Avatar>
+            )}
           </div>
           {!isCollapsed && (
             <>
