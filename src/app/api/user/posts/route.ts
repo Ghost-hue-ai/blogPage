@@ -24,7 +24,8 @@ export async function POST(req: Request) {
       );
     }
 
-    const { heading, description } = await req.json();
+    const { heading, description, url } = await req.json();
+    console.log(url);
 
     if (!heading || !description) {
       return Response.json(
@@ -40,6 +41,7 @@ export async function POST(req: Request) {
       heading,
       description,
       owner: session.user._id,
+      url,
     });
 
     await post.save();

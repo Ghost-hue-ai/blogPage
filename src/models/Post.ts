@@ -7,6 +7,7 @@ interface Post extends Document {
   isLikedByCurrentUser: mongoose.Schema.Types.ObjectId;
   likes: mongoose.Schema.Types.ObjectId;
   friends: mongoose.Schema.Types.ObjectId;
+  url: string;
 }
 
 const postSchema: Schema<Post> = new Schema(
@@ -33,6 +34,7 @@ const postSchema: Schema<Post> = new Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "requests",
     },
+    url: String,
   },
   { timestamps: true }
 );

@@ -18,6 +18,8 @@ import axios from "axios";
 import { signOut, useSession } from "next-auth/react";
 import CommentTab from "./CommentTab";
 import { useSidebar } from "@/contexts/SidebarContext";
+import loadConfig from "next/dist/server/config";
+import { Divide } from "lucide-react";
 
 interface FormData {
   heading: string;
@@ -27,19 +29,26 @@ interface UserDocument {
   username: string;
   profilePic: string;
 }
+interface MultiPartFormData {
+  name: string;
+}
 export default function PublishPost() {
+  const [file, setFile] = useState();
   const { register, handleSubmit } = useForm<FormData>();
   const { data: session, status } = useSession();
   const [user, setUser] = useState<UserDocument>();
   const [title, setTitle] = useState("");
   const [des, setDes] = useState("");
   const [responded, setResponded] = useState(false);
+  const [url, setUrl] = useState("");
 
   const [liked, setLiked] = useState(false);
   const [postId, setPostId] = useState();
   const { isCollapsed } = useSidebar();
 
   async function onSubmit(value: any) {
+    console.log(file);
+
     const heading = value.heading;
     const description = value.description;
     const date = new Date();
@@ -53,22 +62,58 @@ export default function PublishPost() {
       minute: "2-digit",
       hour12: true, // 12-hour format with AM/PM
     });
+
     console.log(heading, description);
     try {
-      const res = await axios.post("/api/user/posts", {
-        heading,
-        description,
-      });
-      if (res.status >= 200 && res.status <= 300) {
-        console.log(res);
-        setTitle(heading);
-        setDes(description);
-        setResponded(true);
-        setPostId(res.data.data._id || "yo");
+      if (file) {
+        const formData = new FormData();
 
-        toast("Post has been created", {
-          description: formatted,
+        formData.append("file", file);
+        const uploadOnCloudinary = await axios.post(
+          "/api/user/posts/upload-post",
+          formData,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        );
+        if (uploadOnCloudinary) {
+          setUrl(uploadOnCloudinary.data.url);
+        }
+        const res = await axios.post("/api/user/posts", {
+          heading,
+          description,
+          url: uploadOnCloudinary?.data.url,
         });
+        if (res.status >= 200 && res.status <= 300) {
+          console.log(res);
+          setTitle(heading);
+          setDes(description);
+          setResponded(true);
+          setPostId(res.data.data._id || "yo");
+
+          toast("Post has been created", {
+            description: formatted,
+          });
+        }
+      } else {
+        const res = await axios.post("/api/user/posts", {
+          heading,
+          description,
+          url: "",
+        });
+        if (res.status >= 200 && res.status <= 300) {
+          console.log(res);
+          setTitle(heading);
+          setDes(description);
+          setResponded(true);
+          setPostId(res.data.data._id || "yo");
+
+          toast("Post has been created", {
+            description: formatted,
+          });
+        }
       }
     } catch (error: any) {
       console.log(error);
@@ -252,6 +297,24 @@ export default function PublishPost() {
                         className="w-full bg-gray-50/80 dark:bg-gray-800/50 border border-gray-200/50 dark:border-gray-600/30 rounded-2xl px-4 py-3 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-transparent transition-all duration-200 resize-none"
                       />
                     </div>
+                    <div className="space-y-2">
+                      <Label
+                        htmlFor="heading"
+                        className="text-sm font-semibold text-gray-700 dark:text-gray-300"
+                      >
+                        File
+                      </Label>
+                      <Input
+                        id="heading"
+                        name="heading"
+                        type="file"
+                        accept="image/png"
+                        onChange={(e: any) => {
+                          setFile(e.target.files?.[0]);
+                        }}
+                        className="bg-gray-50/80 dark:bg-gray-800/50 border border-gray-200/50 dark:border-gray-600/30 rounded-2xl px-4 py-3 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-transparent transition-all duration-200"
+                      />
+                    </div>
 
                     <div className="flex gap-3 pt-4">
                       <DialogTrigger asChild>
@@ -280,27 +343,33 @@ export default function PublishPost() {
           <article className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-white/20 dark:border-gray-700/30 rounded-3xl shadow-xl overflow-hidden hover:shadow-2xl hover:scale-[1.02] transition-all duration-500">
             {/* Media Placeholder */}
             <div className="relative bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 dark:from-gray-700 dark:via-gray-600 dark:to-gray-800 h-80 flex items-center justify-center overflow-hidden">
-              <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent"></div>
-              <div className="relative z-10 text-center">
-                <div className="w-16 h-16 mx-auto mb-3 bg-white/20 dark:bg-gray-800/40 backdrop-blur-sm rounded-2xl flex items-center justify-center border border-white/30 dark:border-gray-600/30">
-                  <svg
-                    className="w-8 h-8 text-gray-400 dark:text-gray-300"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={1.5}
-                      d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-                    />
-                  </svg>
+              {url ? (
+                <img src={url} alt="" />
+              ) : (
+                <div>
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent"></div>
+                  <div className="relative z-10 text-center">
+                    <div className="w-16 h-16 mx-auto mb-3 bg-white/20 dark:bg-gray-800/40 backdrop-blur-sm rounded-2xl flex items-center justify-center border border-white/30 dark:border-gray-600/30">
+                      <svg
+                        className="w-8 h-8 text-gray-400 dark:text-gray-300"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={1.5}
+                          d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                        />
+                      </svg>
+                    </div>
+                    <span className="text-gray-500 dark:text-gray-400 text-sm font-medium">
+                      Media content
+                    </span>
+                  </div>
                 </div>
-                <span className="text-gray-500 dark:text-gray-400 text-sm font-medium">
-                  Media content
-                </span>
-              </div>
+              )}
             </div>
 
             {/* Post Content */}
