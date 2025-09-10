@@ -152,18 +152,18 @@ export default function RenderPost() {
   }, []);
   return (
     <div
-      className={`${isCollapsed ? "ml-[80px]" : "ml-[300px]"} relative mt-16 flex flex-col justify-center p-6 bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 min-h-screen transition-all duration-300 ease-in-out`}
+      className={`${isCollapsed ? "md:ml-[80px]" : "md:ml-[300px]"} relative mt-16 flex flex-col justify-center p-4 sm:p-6 bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 min-h-screen transition-all duration-300 ease-in-out`}
     >
       {commentTabVisible ? <CommentTab postId={commentProp} /> : ""}
-      <div className="flex flex-col gap-6 max-w-2xl mx-auto w-full">
+      <div className="flex flex-col gap-4 sm:gap-6 w-full max-w-2xl mx-auto">
         {rendered ? (
           posts.map((post) => (
             <article
               key={post._id}
-              className="group relative flex flex-col bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-white/20 dark:border-gray-700/30 rounded-3xl shadow-xl hover:shadow-2xl  transition-all duration-500 overflow-hidden"
+              className="group relative flex flex-col bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-white/20 dark:border-gray-700/30 rounded-2xl sm:rounded-3xl shadow-md sm:shadow-xl hover:shadow-2xl transition-all duration-500 overflow-hidden"
             >
               {/* Media/Image */}
-              <div className="relative bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 dark:from-gray-700 dark:via-gray-600 dark:to-gray-800 h-80 flex items-center justify-center overflow-hidden">
+              <div className="relative bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 dark:from-gray-700 dark:via-gray-600 dark:to-gray-800 h-48 sm:h-64 md:h-80 flex items-center justify-center overflow-hidden">
                 <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent">
                   {post.url ? (
                     <img
@@ -198,9 +198,9 @@ export default function RenderPost() {
               </div>
 
               {/* Post Content */}
-              <div className="px-6 py-5">
+              <div className="p-4 sm:px-6 sm:py-5">
                 {/* User info */}
-                <div className="flex items-center gap-4 mb-4">
+                <div className="flex items-start gap-3 sm:gap-4 mb-3 sm:mb-4">
                   <div className="relative">
                     <div className="absolute -inset-0.5 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full opacity-75 group-hover:opacity-100 transition duration-300 blur-sm"></div>
                     <Popover>
@@ -265,7 +265,7 @@ export default function RenderPost() {
 
                   <div className="flex-1">
                     <div className="flex items-center gap-2">
-                      <h3 className="font-bold text-gray-900 dark:text-gray-100 text-base">
+                      <h3 className="font-bold text-gray-900 dark:text-gray-100 text-sm sm:text-base">
                         {post.owner.username}
                       </h3>
                       <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400">
@@ -338,7 +338,7 @@ export default function RenderPost() {
                 </div>
 
                 {/* Actions */}
-                <div className="flex justify-around gap-2 pt-4">
+                <div className="flex flex-wrap justify-between sm:justify-around gap-2 pt-3 sm:pt-4">
                   {/* Like button */}
                   <button
                     onClick={async () => {
@@ -370,7 +370,7 @@ export default function RenderPost() {
                         await likePost(post._id);
                       }
                     }}
-                    className={`group relative flex items-center gap-2 px-6 py-3 rounded-2xl font-medium transition-all duration-300 hover:scale-105 active:scale-95 ${
+                    className={`group relative flex-1 sm:flex-none flex items-center justify-center gap-2 px-3 sm:px-4 py-2 sm:py-3 rounded-xl sm:rounded-2xl font-medium transition-all duration-300 hover:scale-105 active:scale-95 text-sm sm:text-base ${
                       post.isLikedByCurrentUser
                         ? "bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg hover:shadow-xl"
                         : "bg-gray-100/80 dark:bg-gray-700/50 text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:text-blue-600 dark:hover:text-blue-400 border border-gray-200/50 dark:border-gray-600/30"
@@ -390,13 +390,13 @@ export default function RenderPost() {
                       <path d="M7 21H5a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h2v11Z" />
                       <path d="M7 10.5l4.7-6.1a1.8 1.8 0 0 1 3.3.9v3.2h3.2a2.3 2.3 0 0 1 2.2 2.9l-1.2 5a3 3 0 0 1-2.9 2.3H7V10.5Z" />
                     </svg>
-                    <span className="text-sm font-semibold">
+                    <span className="text-xs sm:text-sm font-semibold">
                       {post.isLikedByCurrentUser ? "Liked" : "Like"}
                     </span>
                   </button>
                   {/* Comment button */}
                   <button
-                    className="group flex items-center gap-2 px-6 py-3 rounded-2xl bg-gray-100/80 dark:bg-gray-700/50 text-gray-700 dark:text-gray-300 hover:bg-green-50 dark:hover:bg-green-900/20 hover:text-green-600 dark:hover:text-green-400 border border-gray-200/50 dark:border-gray-600/30 font-medium transition-all duration-300 hover:scale-105 active:scale-95"
+                    className="group flex-1 sm:flex-none flex items-center justify-center gap-2 px-3 sm:px-4 py-2 sm:py-3 rounded-xl sm:rounded-2xl bg-gray-100/80 dark:bg-gray-700/50 text-gray-700 dark:text-gray-300 hover:bg-green-50 dark:hover:bg-green-900/20 hover:text-green-600 dark:hover:text-green-400 border border-gray-200/50 dark:border-gray-600/30 font-medium transition-all duration-300 hover:scale-105 active:scale-95 text-sm sm:text-base"
                     onClick={() => {
                       if (post._id === commentProp) {
                         // same post → toggle visibility
@@ -422,7 +422,7 @@ export default function RenderPost() {
                         d="M7 8h10M7 12h4m1 8l-5-5H4a2 2 0 01-2-2V6a2 2 0 012-2h16a2 2 0 012 2v7a2 2 0 01-2 2h-3l-5 5z"
                       />
                     </svg>
-                    <span className="text-sm font-semibold">Comment</span>
+                    <span className="text-xs sm:text-sm font-semibold">Comment</span>
                   </button>
                   {/* Share button */}
                   <Dialog>
@@ -441,7 +441,7 @@ export default function RenderPost() {
                             d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z"
                           />
                         </svg>
-                        <span className="text-sm font-semibold">Share</span>
+                        <span className="text-xs sm:text-sm font-semibold">Share</span>
                       </button>
                     </DialogTrigger>
                     <DialogContent className="sm:max-w-md">
