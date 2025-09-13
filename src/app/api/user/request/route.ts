@@ -55,6 +55,7 @@ export async function GET(req: Request) {
               $project: {
                 _id: 1,
                 username: 1,
+                profilePic: 1,
               },
             },
           ],
@@ -64,6 +65,28 @@ export async function GET(req: Request) {
       {
         $unwind: "$RequestSender",
       },
+      {
+        $lookup: {
+          from: "users",
+          let: { requestReceiver: "$RequestReceiver" },
+          pipeline: [
+            {
+              $match: {
+                $expr: { $eq: ["$_id", "$$requestReceiver"] },
+              },
+            },
+            {
+              $project: {
+                _id: 1,
+                username: 1,
+                profilePic: 1,
+              },
+            },
+          ],
+          as: "RequestReceiver",
+        },
+      },
+      { $unwind: "$RequestReceiver" },
     ]);
 
     if (friends.length === 0) {

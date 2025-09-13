@@ -1,6 +1,7 @@
 "use client";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
+import { useSession } from "next-auth/react";
 import { Users, MessageCircle, MoreHorizontal } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -20,12 +21,13 @@ interface FriendUser {
 interface Friend {
   _id: string;
   RequestSender: FriendUser;
-  RequestReceiver: string;
+  RequestReceiver: FriendUser;
   status: string;
 }
 
 export default function Friends() {
   const [friends, setFriends] = useState<Friend[]>([]);
+  const { data: session, status } = useSession();
 
   async function fetchFriends() {
     if (friends.length > 0) return;
@@ -70,7 +72,10 @@ export default function Friends() {
                       </Avatar>
                       <div className="flex-1">
                         <h3 className="font-semibold text-gray-900 dark:text-white">
-                          {friendUser.username}
+                          {friend.RequestReceiver.username ==
+                          session?.user.username
+                            ? `${friend.RequestSender.username}`
+                            : `${friend.RequestReceiver.username}`}
                         </h3>
                         <p className="text-sm text-green-600 dark:text-green-400">
                           Friends

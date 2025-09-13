@@ -54,7 +54,7 @@ export default function Sidebar({ className = "" }: SidebarProps) {
   // Prevent hydration mismatch by not rendering dynamic content until mounted
   if (!mounted) {
     return (
-      <aside className="w-[300px] overflow-scroll fixed top-0 h-screen left-0 bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl border-r border-white/20 dark:border-gray-700/30 flex flex-col transition-all duration-300 ease-in-out">
+      <aside className="w-[300px] overflow-hidden fixed top-0 h-screen left-0 bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl border-r border-white/20 dark:border-gray-700/30 flex flex-col transition-all duration-300 ease-in-out">
         {/* Hamburger Menu */}
         <div className="p-4 border-b border-gray-200/50 dark:border-gray-700/30">
           <button className="w-full flex items-center justify-center p-2 rounded-lg hover:bg-gray-100/50 dark:hover:bg-gray-700/30 transition-colors">
@@ -171,8 +171,8 @@ export default function Sidebar({ className = "" }: SidebarProps) {
   return (
     <aside
       className={`${
-        isCollapsed ? "w-[80px]" : "w-[300px]"
-      } overflow-scroll fixed top-0 h-screen left-0 bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl border-r border-white/20 dark:border-gray-700/30 flex flex-col transition-all duration-300 ease-in-out ${className}`}
+        isCollapsed ? "w-[80px] overflow-hidden" : "w-[300px]"
+      }overflow-auto fixed top-0 h-screen left-0 bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl border-r border-white/20 dark:border-gray-700/30 flex flex-col transition-all duration-300 ease-in-out ${className}`}
     >
       {/* Hamburger Menu */}
       <div className="p-4 border-b border-gray-200/50 dark:border-gray-700/30">
@@ -347,26 +347,6 @@ export default function Sidebar({ className = "" }: SidebarProps) {
                   </p>
                   <p className="text-xs text-gray-500 dark:text-gray-400">
                     5m ago
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-3 px-4 py-2 rounded-xl hover:bg-gray-100/50 dark:hover:bg-gray-700/30 transition-colors cursor-pointer">
-                <Avatar className="h-8 w-8">
-                  <AvatarImage
-                    src="https://api.dicebear.com/7.x/initials/svg?seed=Mike"
-                    alt="Mike"
-                  />
-                  <AvatarFallback className="bg-purple-500 text-white text-xs">
-                    M
-                  </AvatarFallback>
-                </Avatar>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">
-                    Mike shared a post
-                  </p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">
-                    1h ago
                   </p>
                 </div>
               </div>
