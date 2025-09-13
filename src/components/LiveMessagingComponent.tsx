@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { socket } from "../socket";
+import axios from "axios";
 
 const LiveMessagingComponent = ({
   sender,
@@ -56,7 +57,7 @@ const LiveMessagingComponent = ({
     socket.emit("joinRoom", room);
   }, []);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!inputRef.current) return;
     const msg = inputRef.current.value.trim();

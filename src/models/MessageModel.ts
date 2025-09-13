@@ -1,12 +1,17 @@
 import mongoose, { Schema, Document } from "mongoose";
 
 interface MessageDocument extends Document {
+  roomId: mongoose.Schema.Types.ObjectId;
   content: string;
   sender: mongoose.Schema.Types.ObjectId;
   receiver: mongoose.Schema.Types.ObjectId;
 }
 const messageSchema: Schema<MessageDocument> = new Schema(
   {
+    roomId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Request",
+    },
     content: {
       type: String,
       required: [true, "content is required"],
